@@ -1,49 +1,86 @@
+/*
+
+Test Steps:
+
+1. Go to http://live.techpanda.org/
+
+2. Click on -> MOBILE -> menu
+
+3. In mobile products list , click on -> Add To Compare -> for 2 mobiles (Sony Xperia & Iphone)
+
+4. Click on -> COMPARE -> button. A popup window opens
+
+5. Verify the pop-up window and check that the products are reflected in it Heading "COMPARE PRODUCTS" with selected products in it.
+
+6. Close the Popup Windows
+
+*/
 package TC;
 
 import driver.driverFactory;
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.io.FileHandler;
+import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
 
 import java.io.File;
-import java.io.IOException;
-import java.time.Duration;
 
 public class TestCase4 {
     @Test
-    public static void testcase4() throws IOException {
-        int scc = 0;
+    public static void testTC04(){
+        int scc=0;
+        StringBuffer verificationErrors = new StringBuffer();
         WebDriver driver = driverFactory.getChromeDriver();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
-        driver.get("http://live.techpanda.org/");
+        try{
+            //1. Go to http://live.techpanda.org/
+            driver.get("http://live.techpanda.org/");
+            //2. Click on -> MOBILE -> menu
+            driver.findElement(By.linkText("MOBILE")).click();
+            Thread.sleep(2000);
+            //3. In mobile products list , click on -> Add To Compare -> for 2 mobiles (Sony Xperia & Iphone)
+            driver.findElement(By.xpath("(//a[@class='link-compare'][normalize-space()='Add to Compare'])[2]")).click();
+            String compare1 = driver.findElement(By.linkText("SONY XPERIA")).getText();
+            driver.findElement(By.xpath("(//a[@class='link-compare'][normalize-space()='Add to Compare'])[3]")).click();
+            String compare2 = driver.findElement(By.linkText("IPHONE")).getText();
+            System.out.println("Compare phone1: " + compare1);
+            System.out.println("Compare phone2: " + compare2);
+            //4. Click on -> COMPARE -> button. A popup window opens
+            driver.findElement(By.xpath("(//button[@title='Compare'])[1]")).click();
+            Thread.sleep(2000);
+            //5. Verify the pop-up window and check that the products are reflected in it Heading "COMPARE PRODUCTS" with selected products in it.
+            // Switch to the new window.
+            for (String handle : driver.getWindowHandles()) {
+                driver.switchTo().window(handle);
+            }
+            String demoSite = driver.findElement(By.cssSelector("h1")).getText();
+            System.out.println("Header: " + demoSite);
+            try{
+                AssertJUnit.assertEquals("COMPARE PRODUCTS",demoSite);
+            } catch (Exception e) {
+                verificationErrors.append(e.toString());
+            }
+            Thread.sleep(2000);
+            String popup1 = driver.findElement(By.xpath("//h2/a[@title='Sony Xperia']")).getText();
+            String popup2 = driver.findElement(By.xpath("//h2/a[@title='IPhone']")).getText();
+            System.out.println("Popup phone1: " + popup1);
+            System.out.println("Popup phone2: " + popup2);
+            AssertJUnit.assertEquals(compare1,popup1);
+            AssertJUnit.assertEquals(compare2,popup2);
+            //6. Close the Popup Windows
+            driver.close();
+            Thread.sleep(2000);
 
-        TestCase4_Page page = new TestCase4_Page(driver);
-
-        page.clickOnMobileMenu();
-        page.addToCompareSonyXperia();
-        page.addToCompareIphone();
-        page.clickOnCompareButton();
-
-
-        String expectedHeading = "COMPARE PRODUCTS";
-        String actualHeading = page.getPopupHeading();
-        assert actualHeading.equals(expectedHeading) : "Popup heading does not match!";
-        String x = page.getProductNames1();
-        System.out.println(x);
-        String y = page.getProductNames2();
-        System.out.println(y);
-        String z = page.getProductPrice1();
-        System.out.println(z);
-        String w = page.getProductPrice2();
-        System.out.println(w);
-
-        //take a picture
-        scc = (scc + 4);
-        File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-        String png = "C:\\Users\\ADMIN\\Desktop\\SWT\\selenium-webdriver-java-master\\src\\test\\java\\testcase\\" + scc + ".png";
-        FileUtils.copyFile(srcFile, new File(png));
+            scc = (scc + 4);
+            File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            String png = "C:\\Users\\ADMIN\\Desktop\\SWT\\selenium-webdriver-java-master\\src\\test\\java\\testcase\\" + scc + ".png";
+            FileUtils.copyFile(srcFile, new File(png));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         driver.quit();
     }
 }

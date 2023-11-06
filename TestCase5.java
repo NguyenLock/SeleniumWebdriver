@@ -15,7 +15,7 @@ public class TestCase5 {
         int scc =0;
         String firstName = "Loc";
         String lastName = "Nguyen";
-        String email = "nlocnguyen333@gmail.com";
+        String email = "nlocnguyen744@gmail.com";
         String password = "123456";
         String confirmPassword = password;
 
